@@ -1,4 +1,4 @@
-# Phone Finder — Project Architecture (Draft v0.1)
+# SADOOM — Project Architecture (Draft v0.1)
 
 > สถานะ: **ข้อเสนอเพื่อพิจารณา** — ยังไม่มีการเขียน Code
 > อัปเดตล่าสุด: 2026-09-28
@@ -113,7 +113,7 @@
 ## 3. Folder Structure
 
 ```
-phone-finder/
+sadoom/
 ├── data/                              # ← ข้อมูลล้วน แยกจาก Logic
 │   ├── phones/
 │   │   ├── samsung-galaxy-a56.json    # 1 ไฟล์ = 1 รุ่น (แก้/รีวิวใน PR ง่าย)
