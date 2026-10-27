@@ -68,6 +68,7 @@ document.addEventListener("click", (e) => {
     case "toggle-lifestyle": {
       const on = Finder.lifestyles.includes(id);
       if (on) Finder.lifestyles = Finder.lifestyles.filter((x) => x !== id);
+      else if (MAX_LIFESTYLES === 1) Finder.lifestyles = [id]; // เลือกอันใหม่ = แทนที่อันเดิม
       else if (Finder.lifestyles.length >= MAX_LIFESTYLES) { toast(`เลือกได้สูงสุด ${MAX_LIFESTYLES} แบบ`); return; }
       else Finder.lifestyles.push(id);
       render({ keepScroll: true }); return;
@@ -109,5 +110,5 @@ document.addEventListener("change", (e) => {
 
 window.addEventListener("hashchange", () => render());
 document.getElementById("data-note").textContent =
-  `ข้อมูลตัวอย่างเพื่อการพัฒนา · ราคาโดยประมาณ · อัปเดต ${fmtDate(DATA_UPDATED)} · กรุณาตรวจสอบกับแหล่งทางการก่อนซื้อ`;
+  `อัปเดตข้อมูลล่าสุด: ${fmtDate(DATA_UPDATED)}`;
 render();

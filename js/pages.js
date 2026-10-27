@@ -11,9 +11,9 @@ function HomePage() {
   return `
     <section class="hero">
       <div class="container">
-        <h1>Find the Right Phone for You.</h1>
-        <p>Choose your budget and lifestyle. We'll help you find a phone that fits your needs.</p>
-        <p class="small" style="margin-top:8px">เลือกงบและรูปแบบการใช้งาน เราจะคัดมือถือที่น่าสนใจประมาณ 3 รุ่น พร้อมเหตุผล — คุณเป็นคนตัดสินใจเอง</p>
+        <img class="hero-logo" src="images/sadoom-logo.webp" alt="SADOOM">
+        <h1><span>Not the Most Expensive.</span><span>Just the Right One.</span></h1>
+        <p>เลือกงบและการใช้งาน เราคัดรุ่นที่คุ้มมาให้ เรียงจากถูกไปแพง พร้อมเหตุผล — คุณตัดสินใจเอง</p>
         <div class="cta">
           <a class="btn btn-primary" href="#/finder" data-action="start-finder">Find My Phone</a>
           <a class="btn" href="#/picks">Phones of the Month</a>
@@ -23,11 +23,11 @@ function HomePage() {
 
     <section class="section">
       <div class="container">
-        <div class="section-head"><h2>How it works</h2></div>
+        <div class="section-head"><h2>How It Works</h2></div>
         <div class="steps">
-          <div class="card"><div class="step-num">STEP 1</div><h3>เลือกงบประมาณ</h3><p class="small muted">จำกัดตัวเลือกให้อยู่ในช่วงราคาที่คุณสบายใจ</p></div>
-          <div class="card"><div class="step-num">STEP 2</div><h3>เลือกไลฟ์สไตล์ 1–2 แบบ</h3><p class="small muted">บอกเราว่าคุณใช้มือถือทำอะไรเป็นหลัก</p></div>
-          <div class="card"><div class="step-num">STEP 3</div><h3>ดูตัวเลือกพร้อมเหตุผล</h3><p class="small muted">ประมาณ 3 รุ่นที่มีจุดเด่นต่างกัน ไม่มีคะแนน ไม่มีผู้ชนะ</p></div>
+          <div class="card"><h3><span class="step-num">STEP 1 —</span> เลือกงบประมาณ</h3><p class="small muted">กำหนดงบที่คุณต้องการ เพื่อค้นหามือถือที่เหมาะกับเงินในกระเป๋า</p></div>
+          <div class="card"><h3><span class="step-num">STEP 2 —</span> เลือกสไตล์การใช้งาน</h3><p class="small muted">ไม่ว่าจะเน้นถ่ายภาพ เล่นเกม หรือใช้งานรอบด้าน เราจะช่วยคัดรุ่นที่ตรงกับความต้องการของคุณ</p></div>
+          <div class="card"><h3><span class="step-num">STEP 3 —</span> เปรียบเทียบตัวเลือก</h3><p class="small muted">พบกับมือถือที่ผ่านการคัดเลือก พร้อมราคา จุดเด่น และข้อจำกัด เรียงตามราคาเพื่อให้คุณตัดสินใจได้ง่ายขึ้น โดยไม่มีการจัดอันดับหรือชี้นำว่ารุ่นไหนดีที่สุด</p></div>
         </div>
       </div>
     </section>
@@ -38,7 +38,8 @@ function HomePage() {
           <div><h2>${esc(latest.title)}</h2><p class="muted small">${esc(latest.intro)}</p></div>
           <a class="btn btn-sm" href="#/picks">ดูทั้งหมด</a>
         </div>
-        <div class="grid">${latest.picks.slice(0, 3).map(PickCard).join("")}</div>
+        <p class="small" style="font-weight:600;margin-bottom:12px">งบ ${esc(BUDGETS[0].label)}</p>
+        <div class="grid">${latest.picks.filter((pk) => pk.budget === BUDGETS[0].id).map(PickCard).join("")}</div>
       </div>
     </section>`;
 }
@@ -73,11 +74,11 @@ function FinderPage() {
       ${stepper}
       <p class="small muted">ขั้นที่ 2 จาก 2 · งบ ${esc(BUDGETS.find((b) => b.id === s.budget).label)}</p>
       <h1>คุณใช้มือถือแบบไหน?</h1>
-      <p class="muted" style="margin:6px 0 20px">เลือกได้ 1–2 แบบ (เลือกแล้ว ${s.lifestyles.length}/${MAX_LIFESTYLES})</p>
+      <p class="muted" style="margin:6px 0 20px">${MAX_LIFESTYLES === 1 ? "เลือกแบบที่ตรงกับคุณที่สุด" : `เลือกได้ 1–${MAX_LIFESTYLES} แบบ (เลือกแล้ว ${s.lifestyles.length}/${MAX_LIFESTYLES})`}</p>
       <div class="options" role="group" aria-label="ไลฟ์สไตล์">
         ${Object.entries(Engine.PROFILES).map(([id, pr]) => {
           const on = s.lifestyles.includes(id);
-          const disabled = full && !on;
+          const disabled = MAX_LIFESTYLES > 1 && full && !on;
           return `
             <button class="option" data-action="toggle-lifestyle" data-id="${id}" aria-pressed="${on}" aria-disabled="${disabled}">
               <span class="title">${esc(pr.label)} — ${esc(pr.title)}</span><span class="desc">${esc(pr.desc)}</span>
@@ -103,7 +104,7 @@ function ResultsPage(query) {
     <section class="section">
       <div class="container">
         <div class="section-head">
-          <h1 style="font-size:30px">Phones Recommended for You</h1>
+          <h1 style="font-size:26px">Phones Recommended for You</h1>
           <div style="display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:12px">
             <span class="chip num">${esc(result.budget.label)}</span>
             ${result.lifestyles.map((id) => `<span class="chip">${esc(Engine.PROFILES[id].label)}</span>`).join("")}
@@ -112,7 +113,8 @@ function ResultsPage(query) {
         </div>
         ${result.notes.map((n) => `<div class="notice" style="margin-bottom:12px">${esc(n)}</div>`).join("")}
         ${result.items.length
-          ? `<div class="grid">${result.items.map((i) => RecommendationCard(i, result.lifestyles)).join("")}</div>`
+          ? `<p class="rec-count" style="margin-bottom:12px">แนะนำ ${result.items.length} รุ่น · เลื่อนลงเพื่อดูทีละรุ่น</p>
+             <div class="rec-list">${result.items.map((i) => RecommendationCard(i, result.lifestyles)).join("")}</div>`
           : `<div class="notice">ยังไม่มีรุ่นที่เหมาะในงบนี้ ลองเปลี่ยนงบหรือไลฟ์สไตล์ดูนะครับ</div>`}
         <p class="note" style="margin-top:20px">
           แต่ละรุ่นมีจุดเด่นต่างกัน — ลำดับการแสดงไม่ใช่อันดับ และเราไม่ให้คะแนนมือถือ
@@ -125,8 +127,8 @@ function ResultsPage(query) {
 function PhonesPage(query) {
   const active = query.get("budget") || "all";
   const list = PHONES
-    .filter((p) => active === "all" || p.variants.some((v) => budgetOf(v.price)?.id === active))
-    .sort((a, b) => minPrice(a) - minPrice(b));
+    .filter((p) => active === "all" || budgetOf(realPrice(p))?.id === active || lineupHas(active, p.id))
+    .sort((a, b) => realPrice(a) - realPrice(b));
   return `
     <section class="section">
       <div class="container">
@@ -153,8 +155,11 @@ function PhoneDetailPage(id) {
           <div>
             <div class="list-title">ราคาโดยประมาณ</div>
             <div class="variants">${p.variants.map((v) => `<span class="chip num">${variantLabel(v)} · ${fmtPrice(v.price)}</span>`).join("")}</div>
+            ${p.priceNote ? `<p class="price-note">${esc(p.priceNote)}</p>` : ""}
             <p class="note">อัปเดตราคา ${esc(fmtDate(p.updated.price))}</p>
           </div>
+          ${WarningBox(p)}
+          ${BuyButton(p, "")}
           ${CompareButton(p.id, "")}
         </aside>
 
@@ -162,6 +167,7 @@ function PhoneDetailPage(id) {
           <section class="spec-section">
             <h2>Overview</h2>
             <p>${esc(p.summary)}</p>
+            ${TipBox(p) ? `<div style="margin-top:12px">${TipBox(p)}</div>` : ""}
           </section>
           <section class="pc card">
             <div><div class="list-title">ข้อดี</div>${Bullets(p.pros, "pos")}</div>
@@ -172,23 +178,23 @@ function PhoneDetailPage(id) {
             <div><div class="list-title">ไม่เหมาะกับใคร</div>${Bullets(p.notFor, "neg")}</div>
           </section>
           <section class="spec-section"><h2>Performance</h2>
-            ${SpecRows([["Chipset", p.chipset], ["RAM / Storage", p.variants.map(variantLabel).join(", ")]])}
+            ${SpecRows([["Chipset", p.chipset], ["RAM / Storage", p.variants.map(variantLabel).join(", ")], ["ฟีเจอร์เกม", p.gameFeatures]])}
           </section>
           <section class="spec-section"><h2>Display</h2>
             ${SpecRows([["ขนาด", `${p.display.size} นิ้ว`], ["ประเภทจอ", p.display.panel], ["ความละเอียด", p.display.res],
-                        ["Refresh rate", `${p.display.hz}Hz`], ["ความสว่างสูงสุด", `${fmtNum(p.display.nits)} nits`]])}
+                        ["Refresh rate", `${p.display.hz}Hz`], ["ความสว่างสูงสุด", nitsText(p.display.nits)]])}
           </section>
           <section class="spec-section"><h2>Camera</h2>
             ${SpecRows([["กล้องหลัก", c.main], ["มุมกว้าง (Ultrawide)", c.ultrawide || "ไม่มี"],
                         ["เทเลโฟโต้", c.tele ? c.tele.desc : "ไม่มี"], ["กล้องหน้า", c.front], ["วิดีโอ", c.video]])}
           </section>
           <section class="spec-section"><h2>Battery</h2>
-            ${SpecRows([["ความจุ", `${fmtNum(p.battery.mah)} mAh`], ["ชาร์จแบบสาย", `${p.charging.wired}W`],
+            ${SpecRows([["ความจุ", `${fmtNum(p.battery.mah)} mAh`], ["ชาร์จแบบสาย", wiredText(p.charging)],
                         ["ชาร์จไร้สาย", p.charging.wireless ? `${p.charging.wireless}W` : "ไม่รองรับ"]])}
           </section>
           <section class="spec-section"><h2>Software & Build</h2>
-            ${SpecRows([["ระบบปฏิบัติการ", p.os], ["อัปเดตระบบ", `${p.updates.os} ปี`], ["อัปเดตความปลอดภัย", `${p.updates.security} ปี`],
-                        ["กันน้ำกันฝุ่น", p.ip], ["น้ำหนัก", `${p.weight} g`], ["ลำโพงสเตอริโอ", p.stereo ? "มี" : "ไม่มี"], ["วางจำหน่าย", p.release]])}
+            ${SpecRows([["ระบบปฏิบัติการ", p.os], ["อัปเดตระบบ", updatesText(p.updates.os)], ["อัปเดตความปลอดภัย", updatesText(p.updates.security)],
+                        ["กันน้ำกันฝุ่น", p.ip], ["น้ำหนัก", weightText(p.weight)], ["ลำโพงสเตอริโอ", stereoText(p.stereo)], ["วางจำหน่าย", p.release]])}
             <p class="note">ข้อมูลสเปกอัปเดต ${esc(fmtDate(p.updated.specs))} · ควรตรวจสอบกับแหล่งทางการอีกครั้ง</p>
           </section>
         </div>
@@ -230,21 +236,20 @@ function ComparePage(query) {
     ["RAM / Storage", (p) => p.variants.map(variantLabel).join(", ")],
     ["จอ", (p) => `${p.display.size}" ${p.display.panel}`],
     ["Refresh rate", (p) => `${p.display.hz}Hz`],
-    ["ความสว่าง", (p) => `${fmtNum(p.display.nits)} nits`],
+    ["ความสว่าง", (p) => nitsText(p.display.nits)],
     ["แบตเตอรี่", (p) => `${fmtNum(p.battery.mah)} mAh`],
-    ["ชาร์จ", (p) => `${p.charging.wired}W${p.charging.wireless ? ` · ไร้สาย ${p.charging.wireless}W` : ""}`],
+    ["ชาร์จ", (p) => `${wiredText(p.charging, true)}${p.charging.wireless ? ` · ไร้สาย ${p.charging.wireless}W` : ""}`],
     ["กล้องหลัก", (p) => p.cameras.main],
     ["มุมกว้าง", (p) => p.cameras.ultrawide || "—"],
     ["เทเลโฟโต้", (p) => (p.cameras.tele ? p.cameras.tele.desc : "—")],
     ["กล้องหน้า", (p) => p.cameras.front],
     ["วิดีโอ", (p) => p.cameras.video],
     ["ระบบ", (p) => p.os],
-    ["อัปเดตความปลอดภัย", (p) => `${p.updates.security} ปี`],
+    ["อัปเดตความปลอดภัย", (p) => updatesText(p.updates.security)],
     ["กันน้ำ", (p) => p.ip],
-    ["น้ำหนัก", (p) => `${p.weight} g`],
+    ["น้ำหนัก", (p) => weightText(p.weight)],
   ];
   const cols = `grid-template-columns: ${"minmax(0,1fr) ".repeat(phones.length)}`;
-  const colsDesktop = `grid-template-columns: 170px ${"minmax(0,1fr) ".repeat(phones.length)}`;
 
   const body = rows.map(([label, fn]) => {
     const values = phones.map(fn);
@@ -258,8 +263,7 @@ function ComparePage(query) {
 
   return `
     <style>
-      .cmp-row, .compare-head { ${colsDesktop}; }
-      @media (max-width: 720px) { .cmp-row, .compare-head { ${cols}; } }
+      .cmp-row, .compare-head { ${cols}; }
     </style>
     <section class="section"><div class="container">
       <div class="section-head"><h1 style="font-size:30px">Compare</h1>
@@ -285,20 +289,25 @@ function ComparePage(query) {
 }
 
 function PickCard(pick) {
-  const p = getPhone(pick.phoneId);
-  const cat = PICK_CATEGORIES.find((c) => c.key === pick.key);
-  if (!p || !cat) return "";
-  const alts = (pick.alternatives || []).map(getPhone).filter(Boolean);
+  const list = lineupPhones(pick.budget, pick.key);
+  const p = list.find((x) => x.id === pick.phoneId);
+  const profile = Engine.PROFILES[pick.key];
+  if (!p || !profile) return "";
+  const v = [...p.variants].sort((x, y) => x.price - y.price)[0];
+  const alts = list.filter((x) => x.id !== p.id);
   return `
     <article class="card pick">
-      <div><div class="cat">${esc(cat.label)}</div><div class="xs muted">${esc(cat.desc)}</div></div>
+      <div><div class="cat">${esc(profile.label)}</div><div class="xs muted">${esc(profile.title)} · ${esc(profile.desc)}</div></div>
       ${PhoneImage(p, 150)}
       <div>
         <h3 style="font-size:18px">${esc(fullName(p))}</h3>
-        <div class="small muted num">เริ่มต้น ~${fmtPrice(minPrice(p))}</div>
+        <div class="price num">~${fmtPrice(v.price)} <span class="muted small">(${variantLabel(v)})</span></div>
+        ${p.priceNote ? `<div class="price-note">${esc(p.priceNote)}</div>` : ""}
       </div>
-      <p class="small">${esc(pick.blurb)}</p>
-      ${alts.length ? `<p class="xs muted">ตัวเลือกอื่นที่น่าสนใจ: ${alts.map((a) => `<a href="#/phones/${esc(a.id)}">${esc(fullName(a))}</a>`).join(", ")}</p>` : ""}
+      ${WarningBox(p)}
+      <p class="small">${esc(p.summary)}</p>
+      ${alts.length ? `<p class="xs muted">ตัวเลือกเพิ่มเติมในหมวดนี้: ${alts.map((a) => `<a href="#/phones/${esc(a.id)}">${esc(fullName(a))}</a> (~${fmtPrice(realPrice(a))})`).join(", ")}</p>` : ""}
+      ${BuyButton(p)}
       <div class="card-actions"><a class="btn btn-sm" href="#/phones/${esc(p.id)}">View Details</a>${CompareButton(p.id)}</div>
     </article>`;
 }
@@ -313,11 +322,14 @@ function PicksPage(month) {
         <p class="small muted">Phones of the Month</p>
         <h1 style="font-size:30px">${esc(current.title)}</h1>
         <p class="muted" style="margin-top:6px">${esc(current.intro)}</p>
-        <p class="note">"Best" คือหมวดคำแนะนำของเรา ไม่ใช่การให้คะแนน — แต่ละหมวดมีตัวเลือกอื่นให้พิจารณาด้วย</p>
+        <p class="note">เป็นคำแนะนำตามหมวดการใช้งาน ไม่ใช่การให้คะแนนหรือจัดอันดับ — ราคาเป็นราคาโดยประมาณ ตรวจสอบกับร้านค้าก่อนซื้อ</p>
       </div>
       ${sorted.length > 1 ? `<div class="filters">${sorted.map((m) =>
         `<a class="chip" href="#/picks/${m.month}" ${m === current ? 'aria-current="page"' : ""}>${esc(fmtMonth(m.month))}</a>`).join("")}</div>` : ""}
-      <div class="grid">${current.picks.map(PickCard).join("")}</div>
+      ${BUDGETS.map((b) => {
+        const cards = current.picks.filter((pk) => pk.budget === b.id).map(PickCard).join("");
+        return cards ? `<h2 style="font-size:20px;margin:28px 0 12px">งบ ${esc(b.label)}</h2><div class="grid">${cards}</div>` : "";
+      }).join("")}
     </div></section>`;
 }
 

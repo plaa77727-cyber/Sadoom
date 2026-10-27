@@ -1,16 +1,5 @@
-1. Design tokens       → src/styles/tokens.css
-              2. Base / Layout / UI  → src/styles/globals.css + components/ui
-    <script>  1. CONFIG              → src/config/*
-              2. DATA                → data/phones/*.json, data/picks/*.json
-              3. RECOMMENDATION      → src/core/recommendation/*
-              4. STATE (compare)     → src/hooks/useCompareList
-              5. UTILS               → src/lib/*
-              6. COMPONENTS          → src/components/*
-              7. PAGES               → src/app/*
-              8. ROUTER + EVENTS     → (Next.js จัดการให้)
--->
+/* Phone Finder — styles (mobile-first, แนวตั้งแบบแอป) */
 
-<style>
 /* ============================================================
    1. DESIGN TOKENS
    ============================================================ */
@@ -29,7 +18,7 @@
   --radius: 14px;
   --radius-sm: 10px;
   --font: "Inter", "IBM Plex Sans Thai", system-ui, -apple-system, "Segoe UI", sans-serif;
-  --max-w: 1120px;
+  --max-w: 480px; /* ความกว้างแบบแอปมือถือ แสดงเป็นคอลัมน์เดียวแนวตั้ง */
 }
 @media (prefers-color-scheme: dark) {
   :root {
@@ -89,23 +78,22 @@ button { font: inherit; color: inherit; }
 }
 .site-header .bar { display: flex; align-items: center; justify-content: space-between; height: 60px; }
 .logo { font-weight: 700; text-decoration: none; letter-spacing: -0.01em; display: flex; align-items: center; gap: 8px; }
-.logo-mark { width: 22px; height: 22px; border-radius: 6px; background: var(--accent); }
+.logo-mark { width: 30px; height: 30px; border-radius: 8px; object-fit: cover; }
+.hero-logo { width: 140px; height: 140px; border-radius: 28px; object-fit: cover; margin-bottom: 20px; }
 .nav { display: flex; gap: 4px; }
 .nav a {
   text-decoration: none; padding: 6px 12px; border-radius: 8px; color: var(--muted); font-weight: 500; font-size: 15px;
 }
 .nav a:hover { color: var(--text); background: var(--surface-2); }
 .nav a.active { color: var(--text); background: var(--surface-2); }
-.menu-btn { display: none; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
-@media (max-width: 720px) {
-  .menu-btn { display: block; }
-  .nav {
-    display: none; position: absolute; left: 0; right: 0; top: 60px;
-    flex-direction: column; padding: 8px 16px 16px; background: var(--bg); border-bottom: 1px solid var(--border);
-  }
-  .nav.open { display: flex; }
-  .nav a { padding: 12px; }
+.site-header .container { position: relative; }
+.menu-btn { display: block; background: none; border: 1px solid var(--border); border-radius: 8px; padding: 6px 10px; cursor: pointer; }
+.nav {
+  display: none; position: absolute; left: 0; right: 0; top: 60px;
+  flex-direction: column; padding: 8px 16px 16px; background: var(--bg); border-bottom: 1px solid var(--border);
 }
+.nav.open { display: flex; }
+.nav a { padding: 12px; }
 
 /* Footer */
 .site-footer { border-top: 1px solid var(--border); padding: 28px 0 40px; margin-top: 40px; }
@@ -121,13 +109,15 @@ button { font: inherit; color: inherit; }
 .btn-primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
 .btn-primary:hover { background: color-mix(in srgb, var(--accent) 88%, black); border-color: transparent; }
 .btn-primary:disabled { opacity: .45; cursor: not-allowed; }
+.btn-buy { width: 100%; background: var(--positive); border-color: var(--positive); color: var(--bg); }
+.btn-buy:hover { background: color-mix(in srgb, var(--positive) 88%, black); border-color: transparent; }
 .btn-sm { min-height: 36px; padding: 0 12px; font-size: 14px; }
 .btn-ghost { background: none; border-color: transparent; }
 .btn.is-on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
 
 /* Card */
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; }
-.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+.grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
 
 /* Chip / Badge */
 .chip {
@@ -139,7 +129,7 @@ button { font: inherit; color: inherit; }
 .badge-caution { background: color-mix(in srgb, var(--caution) 14%, transparent); color: var(--caution); }
 
 /* Selectable option (Finder) */
-.options { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.options { display: grid; gap: 12px; grid-template-columns: 1fr; }
 .option {
   text-align: left; width: 100%; padding: 16px 18px; border-radius: var(--radius);
   border: 1.5px solid var(--border); background: var(--surface); cursor: pointer;
@@ -152,34 +142,55 @@ button { font: inherit; color: inherit; }
 .option .desc { font-size: 14px; color: var(--muted); display: block; margin-top: 2px; }
 
 /* Hero */
-.hero { padding: 64px 0 48px; }
-.hero h1 { font-size: clamp(34px, 6vw, 54px); letter-spacing: -0.025em; max-width: 14ch; }
+.hero { padding: 40px 0 32px; }
+.hero h1 { font-size: clamp(24px, 7.2vw, 36px); letter-spacing: -0.025em; }
+.hero h1 span { display: block; white-space: nowrap; }
 .hero p { font-size: 18px; color: var(--muted); max-width: 52ch; margin-top: 16px; }
-.hero .cta { margin-top: 28px; display: flex; gap: 12px; flex-wrap: wrap; }
+.hero .cta { margin-top: 28px; display: flex; flex-direction: column; gap: 12px; max-width: 320px; }
+.hero .cta .btn { width: 100%; white-space: nowrap; }
 
-.steps { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
-.step-num { font-size: 13px; font-weight: 700; color: var(--accent); }
+.steps { display: grid; gap: 12px; grid-template-columns: 1fr; }
+.step-num { font-weight: 700; color: var(--accent); }
+.steps h3 { font-size: 17px; margin-bottom: 6px; }
+.footer-title { font-weight: 700; color: var(--text); }
 
 /* Finder */
-.finder { max-width: 820px; margin: 0 auto; padding: 32px 0 120px; }
+.finder { padding: 24px 0 24px; }
 .stepper { display: flex; gap: 8px; margin-bottom: 24px; }
 .stepper span { flex: 1; height: 4px; border-radius: 4px; background: var(--border); }
 .stepper span.done { background: var(--accent); }
 .finder h1 { font-size: 28px; }
 .finder-actions {
-  display: flex; justify-content: space-between; gap: 12px; margin-top: 28px;
+  position: sticky; bottom: 0; z-index: 15;
+  display: flex; gap: 12px; margin: 28px -16px 0;
+  padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+  background: var(--bg); border-top: 1px solid var(--border);
 }
-@media (max-width: 720px) {
-  .finder-actions {
-    position: fixed; left: 0; right: 0; bottom: 0; z-index: 15; margin: 0;
-    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
-    background: var(--surface); border-top: 1px solid var(--border);
-  }
-  .finder-actions .btn { flex: 1; }
-}
+.finder-actions .btn { flex: 1; }
 
 /* Phone image */
 .phone-img { display: flex; justify-content: center; padding: 12px 0; background: var(--surface-2); border-radius: var(--radius-sm); }
+
+/* ไฮไลต์ข้อความราคา/โปรโมชั่น (priceNote) */
+.price-note {
+  display: inline-block; margin-top: 6px; padding: 2px 8px; border-radius: 6px;
+  background: #FFFF66; color: #1a1a1a; font-size: 13px; font-weight: 600;
+}
+
+/* กล่องคำเตือน (ไฮไลต์เหลืองเหมือนราคาโปร) */
+.warn-box { background: #FFFF66; color: #1a1a1a; border-radius: 10px; padding: 12px 14px; font-size: 14px; line-height: 1.55; }
+.warn-box ul { margin-top: 6px; padding-left: 18px; list-style: disc; }
+.warn-box li + li { margin-top: 3px; }
+/* กล่องเกร็ดความรู้ */
+.tip-box { background: var(--accent-soft); border-radius: 10px; padding: 10px 12px; font-size: 14px; }
+
+/* รูปมือถือจริง: พื้นขาวตามรูปสินค้า */
+.phone-img.has-photo { background: #fff; }
+.phone-img.has-photo img { width: auto; max-width: 100%; object-fit: contain; }
+
+/* Recommendation list — ทีละรุ่น เลื่อนลงแนวตั้ง */
+.rec-list { display: flex; flex-direction: column; gap: 24px; }
+.rec-count { font-size: 13px; color: var(--muted); font-weight: 500; }
 
 /* Recommendation card */
 .rec { display: flex; flex-direction: column; gap: 14px; }
@@ -202,15 +213,10 @@ button { font: inherit; color: inherit; }
 .card-actions .btn { flex: 1; }
 
 /* Detail */
-.detail { display: grid; gap: 32px; grid-template-columns: 340px 1fr; padding: 32px 0; align-items: start; }
-.detail-aside { position: sticky; top: 80px; }
-@media (max-width: 860px) {
-  .detail { grid-template-columns: 1fr; }
-  .detail-aside { position: static; }
-}
+.detail { display: grid; gap: 28px; grid-template-columns: 1fr; padding: 24px 0; }
 .spec-section h2 { font-size: 20px; margin-bottom: 10px; }
 .spec-rows { border-top: 1px solid var(--border); }
-.spec-rows > div { display: grid; grid-template-columns: 160px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
+.spec-rows > div { display: grid; grid-template-columns: 130px 1fr; gap: 12px; padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 15px; }
 .spec-rows dt { color: var(--muted); }
 .spec-rows dd { margin: 0; }
 @media (max-width: 480px) { .spec-rows > div { grid-template-columns: 1fr; gap: 0; } }
@@ -227,11 +233,9 @@ button { font: inherit; color: inherit; }
 .cmp-row { display: grid; gap: 8px; padding: 12px 0; border-bottom: 1px solid var(--border); font-size: 14.5px; }
 .cmp-row .label { color: var(--muted); font-weight: 500; }
 .cmp-row .val { overflow-wrap: anywhere; }
-@media (max-width: 720px) {
-  .cmp-row .label { grid-column: 1 / -1; font-size: 13px; }
-  .cmp-row .val { font-size: 14px; }
-  .compare-head .spacer { display: none; }
-}
+.cmp-row .label { grid-column: 1 / -1; font-size: 13px; }
+.cmp-row .val { font-size: 14px; }
+.compare-head .spacer { display: none; }
 .compare-tools { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; justify-content: space-between; margin: 20px 0 8px; }
 select {
   font: inherit; min-height: 40px; padding: 0 12px; border-radius: 10px; border: 1px solid var(--border);

@@ -5,6 +5,10 @@
    6. COMPONENTS (ฟังก์ชันคืนค่า HTML string)
    ============================================================ */
 function PhoneImage(p, height = 180) {
+  // มีรูปจริง (field image) ใช้รูปจริง ไม่มีก็ใช้ภาพจำลองด้านล่าง
+  if (p.image) {
+    return `<div class="phone-img has-photo"><img src="${esc(p.image)}" alt="" loading="lazy" style="height:${height}px"></div>`;
+  }
   // ภาพจำลอง (placeholder) — แทนที่ด้วยรูปจริงได้ภายหลังผ่าน field images
   const w = Math.round(height * 0.5);
   const light = ["#e6e2dc", "#d9dce1", "#b9c7d8"].includes(p.color);
@@ -28,7 +32,7 @@ function KeySpecs(p) {
     <ul class="keyspecs">
       <li><span class="k">ชิป</span><span>${esc(p.chipset)}</span></li>
       <li><span class="k">จอ</span><span class="num">${p.display.size}" ${esc(p.display.panel)} ${p.display.hz}Hz</span></li>
-      <li><span class="k">แบต</span><span class="num">${fmtNum(p.battery.mah)} mAh · ${p.charging.wired}W</span></li>
+      <li><span class="k">แบต</span><span class="num">${fmtNum(p.battery.mah)} mAh · ${wiredText(p.charging, true)}</span></li>
       <li><span class="k">กล้อง</span><span>${esc(c.main)}${c.ultrawide ? " + UW " + esc(c.ultrawide) : ""}${c.tele ? " + Tele " + esc(c.tele.desc) : ""}</span></li>
     </ul>`;
 }
@@ -55,9 +59,12 @@ function RecommendationCard(item, lifestyleIds) {
       <div>
         <h3>${esc(fullName(p))}</h3>
         <div class="price num">~${fmtPrice(item.variant.price)} <span class="muted small">(${variantLabel(item.variant)})</span></div>
+        ${p.priceNote ? `<div class="price-note">${esc(p.priceNote)}</div>` : ""}
       </div>
+      ${WarningBox(p)}
       ${KeySpecs(p)}
       <p class="headline">${esc(item.headline)}</p>
+      ${TipBox(p)}
       <div>
         <div class="list-title">ทำไมเราแนะนำรุ่นนี้</div>
         ${Bullets(item.why, "why")}
@@ -66,6 +73,7 @@ function RecommendationCard(item, lifestyleIds) {
         <div><div class="list-title">ข้อดี</div>${Bullets(p.pros.slice(0, 2), "pos")}</div>
         <div><div class="list-title">ควรพิจารณา</div>${Bullets(item.considerations, "neg")}</div>
       </div>
+      ${BuyButton(p)}
       <div class="card-actions">
         <a class="btn btn-sm btn-primary" href="#/phones/${esc(p.id)}">View Details</a>
         ${CompareButton(p.id)}

@@ -43,7 +43,7 @@ const Engine = (() => {
       pos: (p) => p.assess.batteryLife ? "แบตใช้งานได้ทั้งวันจากการจัดการพลังงานที่ดี" : `แบต ${fmtNum(p.battery.mah)} mAh ใช้งานได้ทั้งวันสบาย ๆ`,
       neg: () => "แบตระดับกลาง ใช้หนักอาจต้องชาร์จระหว่างวัน",
     },
-    charging:    { pos: (p) => `ชาร์จเร็ว ${p.charging.wired}W`, neg: (p) => `ชาร์จ ${p.charging.wired}W ค่อนข้างช้า` },
+    charging:    { pos: (p) => `ชาร์จเร็ว ${p.charging.wired}W`, neg: (p) => p.charging.wired == null ? `ชาร์จ: ${wiredText(p.charging)}` : `ชาร์จ ${p.charging.wired}W ค่อนข้างช้า` },
     camera:      { pos: (p) => `กล้องหลัก ${p.cameras.main} ให้ภาพดีและประมวลผลเก่ง`, neg: () => "คุณภาพกล้องพอใช้ ไม่ได้โดดเด่นในงบนี้" },
     video:       { pos: (p) => `ถ่ายวิดีโอได้ดี (${p.cameras.video})`, neg: () => "ความสามารถด้านวิดีโอค่อนข้างพื้นฐาน" },
     zoom:        {
@@ -51,19 +51,11 @@ const Engine = (() => {
       neg: (p) => p.cameras.tele ? `เลนส์ซูม ${p.cameras.tele.zoom}x ยังซูมไกลได้จำกัด` : "ไม่มีเลนส์ซูม (เทเลโฟโต้)",
     },
     ultrawide:   { pos: (p) => `มีกล้องมุมกว้าง ${p.cameras.ultrawide}`, neg: () => "ไม่มีกล้องมุมกว้าง" },
-    speakers:    { pos: () => "ลำโพงเสียงดี ดูหนังฟังเพลงเพลิน", neg: () => "ลำโพงเสียงธรรมดา" },
-    software:    { pos: (p) => `อัปเดตความปลอดภัยนาน ${p.updates.security} ปี ใช้ได้ยาว`, neg: (p) => `ระยะอัปเดตซอฟต์แวร์ค่อนข้างสั้น (${p.updates.security} ปี)` },
-    value:       { pos: () => "สเปกคุ้มค่าเมื่อเทียบกับราคา", neg: () => "ราคาค่อนข้างสูงเมื่อเทียบกับสเปก" },
+    software:    { pos: (p) => `อัปเดตความปลอดภัยนาน ${p.updates.security} ปี ใช้ได้ยาว`, neg: (p) => p.updates.security == null ? "ยังไม่พบข้อมูลยืนยันระยะเวลาอัปเดตความปลอดภัย" : `ระยะอัปเดตซอฟต์แวร์ค่อนข้างสั้น (${p.updates.security} ปี)` },
   };
 
   // 3.3 Lifestyle profiles: essential = ต้องผ่าน, preferred = ควรมี (เรียงตามความสำคัญ)
   const PROFILES = {
-    balanced: {
-      label: "Balanced", title: "ใช้งานรอบด้าน", desc: "ถ่ายรูป เล่นโซเชียล ดูวิดีโอ ทำงาน — ทุกอย่างดีพอ",
-      phrase: "ต้องการมือถือที่ใช้งานได้ดีรอบด้าน",
-      essential: { performance: "fair", camera: "fair", battery: "fair" },
-      preferred: [["performance", "good"], ["camera", "good"], ["battery", "good"], ["display", "good"], ["software", "good"]],
-    },
     camera: {
       label: "Camera", title: "เน้นกล้อง", desc: "ถ่ายรูป ถ่ายวิดีโอ ซูม มุมกว้าง",
       phrase: "ชอบถ่ายรูปและวิดีโอ",
@@ -76,23 +68,11 @@ const Engine = (() => {
       essential: { performance: "good" },
       preferred: [["performance", "excellent"], ["thermal", "good"], ["display", "good"], ["battery", "good"], ["charging", "good"]],
     },
-    battery: {
-      label: "Battery", title: "แบตอึด", desc: "ใช้ทั้งวันไม่ต้องพกพาวเวอร์แบงก์",
-      phrase: "ต้องการแบตอึด",
-      essential: { battery: "good" },
-      preferred: [["battery", "excellent"], ["charging", "good"], ["software", "good"]],
-    },
-    entertainment: {
-      label: "Entertainment", title: "ดูหนัง / โซเชียล", desc: "จอสวย ลำโพงดี ดูซีรีส์ได้นาน",
-      phrase: "ชอบดูหนัง ดูซีรีส์ และเล่นโซเชียล",
-      essential: { display: "good" },
-      preferred: [["display", "excellent"], ["speakers", "good"], ["battery", "good"], ["performance", "good"]],
-    },
-    value: {
-      label: "Value", title: "คุ้มค่า", desc: "ได้สเปกและอายุการใช้งานมากที่สุดต่อเงินที่จ่าย",
-      phrase: "มองหาความคุ้มค่า",
-      essential: { value: "good" },
-      preferred: [["value", "excellent"], ["software", "good"], ["performance", "good"], ["battery", "good"]],
+    balanced: {
+      label: "Balanced", title: "ใช้งานรอบด้าน", desc: "ถ่ายรูป เล่นโซเชียล ดูวิดีโอ ทำงาน — ทุกอย่างดีพอ",
+      phrase: "ต้องการมือถือที่ใช้งานได้ดีรอบด้าน",
+      essential: { performance: "fair", camera: "fair", battery: "fair" },
+      preferred: [["performance", "good"], ["camera", "good"], ["battery", "good"], ["display", "good"], ["software", "good"]],
     },
   };
 
@@ -151,7 +131,9 @@ const Engine = (() => {
   };
 
   function pick(pool, comparator, chosen) {
-    const sorted = pool.filter((e) => !chosen.includes(e)).sort(comparator);
+    // รุ่นที่ผ่านเกณฑ์หลักต้องมาก่อนรุ่นที่ผ่อนเกณฑ์เสมอ
+    const sorted = pool.filter((e) => !chosen.includes(e))
+      .sort((x, y) => (y.essentialOk - x.essentialOk) || comparator(x, y));
     if (!sorted.length) return null;
     // Diversity: ถ้าตัวแรกแบรนด์ซ้ำกับที่เลือกแล้ว และตัวถัดไปเท่ากันในเชิงเกณฑ์ ให้เลือกแบรนด์ใหม่
     const brands = chosen.map((e) => e.phone.brand);
@@ -176,11 +158,13 @@ const Engine = (() => {
       focused:  `เหมาะสำหรับคนที่${phrase}เป็นหลัก`,
       balanced: `เหมาะสำหรับคนที่${phrase} แต่ยังต้องการมือถือที่ใช้งานทั่วไปได้ดี เช่น ถ่ายรูป ดูวิดีโอ และโซเชียล`,
       value:    `เหมาะสำหรับคนที่ต้องการความคุ้มค่าในงบนี้ โดยยังตอบโจทย์ ${names}`,
+      curated:  `เหมาะสำหรับคนที่${phrase}เป็นหลัก`,
     }[slot];
     const slotReason = {
       focused:  `ตอบโจทย์ ${names} ได้ครบหลายข้อในงบนี้`,
       balanced: "เมื่อดูภาพรวมทั้งกล้อง แบต จอ และประสิทธิภาพ แทบไม่มีจุดอ่อนชัดเจน",
       value:    `ราคาเริ่มต้นประมาณ ฿${fmtNum(ev.variant.price)} ประหยัดกว่าตัวเลือกอื่นที่ผ่านเกณฑ์`,
+      curated:  `คัดมาสำหรับสาย ${names} ในงบนี้`,
     }[slot];
 
     const essentialDims = Object.keys(profile.essential).filter((d) => !ev.met.includes(d));
@@ -194,7 +178,7 @@ const Engine = (() => {
     }
     const flags = [];
     if (ev.overBudget) flags.push("เกินงบเล็กน้อย");
-    if (!ev.essentialOk) flags.push("ผ่านเกณฑ์บางข้อ");
+    if (!ev.essentialOk && slot !== "curated") flags.push("ผ่านเกณฑ์บางข้อ");
     return { headline, why, considerations, flags };
   }
 
@@ -203,6 +187,19 @@ const Engine = (() => {
     const budget = BUDGETS.find((b) => b.id === budgetId);
     const ids = lifestyleIds.filter((id) => PROFILES[id]).slice(0, MAX_LIFESTYLES);
     if (!budget || !ids.length) return { items: [], notes: ["กรุณาเลือกงบและไลฟ์สไตล์"] };
+
+    // รายการที่คัดเอง (data/lineups.js) มาก่อน — ใช้เมื่อเลือกไลฟ์สไตล์เดียว
+    const curated = typeof LINEUPS !== "undefined" && ids.length === 1 && LINEUPS[budgetId]?.[ids[0]];
+    if (curated) {
+      const profile = combineProfiles(ids);
+      const items = curated.map((entry) => applyLineupEntry(phones.find((p) => p.id === lineupId(entry)), entry))
+        .filter(Boolean).map((p) => {
+        const v = [...p.variants].sort((a, b) => a.price - b.price)[0];
+        const ev = evaluate(p, v, profile, realPrice(p) > budget.max);
+        return { slot: "curated", phone: p, variant: v, ...explain(ev, "curated", ids, profile) };
+      }).sort((a, b) => realPrice(a.phone) - realPrice(b.phone)); // ราคาต่ำ → สูง
+      return { items, notes: [], lifestyles: ids, budget };
+    }
 
     const profile = combineProfiles(ids);
     const inBudget = [], over = [];
@@ -244,4 +241,5 @@ const SLOT_LABELS = {
   focused: (ids) => `ตรงกับ ${ids.map((id) => Engine.PROFILES[id].label).join(" + ")} มากที่สุด`,
   balanced: () => "สมดุลกว่า",
   value: () => "คุ้มค่าในงบนี้",
+  curated: (ids) => `ตัวเลือกสาย ${ids.map((id) => Engine.PROFILES[id].label).join(" + ")}`,
 };
